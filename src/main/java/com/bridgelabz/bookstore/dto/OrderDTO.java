@@ -9,11 +9,12 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookDTO {
-    private String name;
-    private String author;
-    private float price;
-    private LocalDate arrivalDate;
-    private String coverImage;
-    private int quantity;
+public class OrderDTO {
+
+    public String address;
+
+    public int userId;
+    public int bookId;
+
+    public LocalDate orderDate = LocalDate.now();
 }

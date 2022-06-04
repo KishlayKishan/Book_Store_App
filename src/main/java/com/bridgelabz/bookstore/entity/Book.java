@@ -7,9 +7,9 @@ import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Collection;
 
 @Entity
-@Table(name = "Book")
 @Data
 @RequiredArgsConstructor
 public class Book {
@@ -26,6 +26,15 @@ public class Book {
     @JsonDeserialize
     private int quantity;
 
+    public Book(BookDTO bookDTO) {
+        this.name = bookDTO.getName();
+        this.author = bookDTO.getAuthor();
+        this.price = bookDTO.getPrice();
+        this.arrivalDate = bookDTO.getArrivalDate();
+        this.coverImage = bookDTO.getCoverImage();
+        this.quantity = bookDTO.getQuantity();
+    }
+
     public Book(int id, BookDTO bookDTO) {
         this.bookID = id;
         this.name = bookDTO.getName();
@@ -36,7 +45,7 @@ public class Book {
         this.quantity = bookDTO.getQuantity();
     }
 
-    public Book(BookDTO book) {
+    public Book(Book book) {
         this.bookID = book.bookID;
         this.name = book.getName();
         this.author = book.getAuthor();
@@ -46,5 +55,14 @@ public class Book {
         this.quantity = book.getQuantity();
     }
 
+    @OneToMany(mappedBy = "book")
+    private Collection<OrderData> orderData;
 
+    public Collection<OrderData> getOrderData() {
+        return orderData;
+    }
+
+    public void setOrderData(Collection<OrderData> orderData) {
+        this.orderData = orderData;
+    }
 }

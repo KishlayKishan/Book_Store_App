@@ -3,16 +3,12 @@ package com.bridgelabz.bookstore.service;
 import com.bridgelabz.bookstore.dto.CartDTO;
 import com.bridgelabz.bookstore.entity.Book;
 import com.bridgelabz.bookstore.entity.Cart;
-import com.bridgelabz.bookstore.entity.User;
+import com.bridgelabz.bookstore.entity.UserData;
+import com.bridgelabz.bookstore.exceptions.CustomException;
 import com.bridgelabz.bookstore.repository.CartRepository;
 import com.bridgelabz.bookstore.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 
 @Service
 public class CartService implements ICartService {
@@ -31,22 +27,23 @@ public class CartService implements ICartService {
 
 
     public Cart addToCart(CartDTO cartDTO) {
-        User user = iUserService.getUserById(cartDTO.getUserId());
+        UserData userData = iUserService.getUserById(cartDTO.getUserId());
         Book book = iBookService.getById(cartDTO.getBookId());
-
-        Cart cart = new Cart(user , book, cartDTO.quantity);
-        return cartRepository.save(cart);
+        if (cartDTO.getQuantity() <= book.getQuantity()) {
+            Cart cart = new Cart(userData, book, cartDTO.getQuantity());
+            return cartRepository.save(cart);
+        } else throw new CustomException("There are only " + book.getQuantity() + " Books in stock at this time, ");
     }
 
 
-    public void deleteFromCart(int cartId) {
-        cartRepository.deleteById(cartId);
+    public String deleteFromCart(int id) {
+        if (cartRepository.findById(id).isPresent()) {
+            cartRepository.deleteById(id);
+            return "Book with ID: " + id + " is Deleted Successfully!!";
+        } else throw new CustomException("No book matches with the given ID");
     }
+    public Cart getById(int id) {
+        return cartRepository.findById(id).orElseThrow(() -> new CustomException("Book  with id " + id + " does not exist in database..!"));
 
-
-    public void deleteAll() {
-        cartRepository.deleteAll();
     }
-
-
 }
